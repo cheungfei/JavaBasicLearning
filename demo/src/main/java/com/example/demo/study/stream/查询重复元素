@@ -1,0 +1,38 @@
+从List中有找出重复元素，也可以利用JDK 8的流来完成。
+
+public static void main(String[] args) {
+    List<String> parameterList = Arrays.asList("1","2","2","3","3","4","4","5","6","7","8");
+    List<String> resultList = parameterList.stream().collect(Collectors.collectingAndThen(Collectors
+            .groupingBy(Function.identity(), Collectors.counting()),map->{
+        map.values().removeIf(size -> size == 1);
+        List<String> tempList = new ArrayList<>(map.keySet());
+        return tempList;
+    }));
+    System.out.println(resultList);
+}
+
+上面的代码首先是先分组，并利用Collectors.counting()统计出每个小组的总数，如果分组内的元素总数等于1，则没有重复，反之，大于1，则说明该元素有重复的。
+
+因此，我们还需要对每个分组进行处理，可以在groupingBy方法的第三个参数，拿到分好后的所有小组。
+
+
+Collectors.groupingBy(Function.identity(), Collectors.counting()),map->{
+            map.values().removeIf(size -> size == 1);
+            List<String> tempList = new ArrayList<>(map.keySet());
+            return tempList;
+        }
+这里使用一个笨办法来找出重复的元素，如果小组内的元素个数等于1的，则删除掉。剩下的分组则都是有重复元素的。程序的输出结果如下：
+
+[2, 3, 4]
+
+
+
+//注意在如果是对象，别忘了重写其 hashCode() 和 equals() 方法。
+public static <T> List<T> getDuplicateElements(List<T> list) {
+    return list.stream()
+            .collect(Collectors.toMap(e -> e, e -> 1, Integer::sum)) // 获得元素出现频率的 Map，键为元素，值为元素出现的次数
+            .entrySet().stream() // Set<Entry>转换为Stream<Entry>
+            .filter(entry -> entry.getValue() > 1) // 过滤出元素出现次数大于 1 的 entry
+            .map(Map.Entry::getKey) // 获得 entry 的键（重复元素）对应的 Stream
+            .collect(Collectors.toList()); // 转化为 List
+}

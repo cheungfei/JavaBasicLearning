@@ -1,0 +1,98 @@
+java判断字符串是否为数字或中文或字母
+
+个人认为最好的方法
+
+*各种字符的unicode编码的范围：
+     * 汉字：[0x4e00,0x9fa5]（或十进制[19968,40869]）
+     * 数字：[0x30,0x39]（或十进制[48, 57]）
+     *小写字母：[0x61,0x7a]（或十进制[97, 122]）
+     * 大写字母：[0x41,0x5a]（或十进制[65, 90]）
+
+public static boolean isLetterDigitOrChinese(String str) {
+  String regex = "^[a-z0-9A-Z\u4e00-\u9fa5]+$";//其他需要，直接修改正则表达式就好
+  return str.matches(regex);
+ }
+
+
+
+ 其他方法：
+
+ 复制代码
+ 1.判断字符串是否仅为数字:
+ 1>用JAVA自带的函数 //只能校验不含负号的数字
+ public static boolean isNumeric(String str){
+   for (int i = str.length();--i>=0;){
+    if (!Character.isDigit(str.charAt(i))){
+     return false;
+    }
+   }
+   return true;
+  }
+ 2>用正则表达式
+ public static boolean isNumeric(String str){
+     Pattern pattern = Pattern.compile("[0-9]*");
+     return pattern.matcher(str).matches();
+  }
+ //可以校验含有负号的数字，"^-?[0-9]+"
+ //"-?[0-9]+.?[0-9]+"可检验所有数字
+ 3>用ascii码
+ public static boolean isNumeric(String str){
+      for(int i=str.length();--i>=0;){
+            int chr=str.charAt(i);
+            if(chr<48 || chr>57)
+                 return false; }
+      return true; }
+ 4>用org.apache.commons.lang.StringUtils.StringUtils.isNumeric("123")  //只能校验不含负号“-”的数字
+ 复制代码
+
+
+ 复制代码
+ 2.判断一个字符串的首字符是否为字母
+ public   static   boolean   test(String   s)
+   {
+   char   c   =   s.charAt(0);
+   int   i   =(int)c;
+   if((i>=65&&i<=90)||(i>=97&&i<=122))
+   {
+   return   true;
+   }
+   else
+   {
+   return   false;
+   }
+   }
+
+ public     static   boolean   check(String   fstrData)
+           {
+                   char   c   =   fstrData.charAt(0);
+                   if(((c>='a'&&c<='z')   ||   (c>='A'&&c<='Z')))
+                 {
+                         return   true;
+                 }else{
+                         return   false;
+                   }
+           }
+ 复制代码
+ 复制代码
+ 3 .判断是否为汉字
+ public boolean vd(String str){
+
+     char[] chars=str.toCharArray();
+     boolean isGB2312=false;
+     for(int i=0;i<chars.length;i++){
+                 byte[] bytes=(""+chars[i]).getBytes();
+                 if(bytes.length==2){
+                             int[] ints=new int[2];
+                             ints[0]=bytes[0]& 0xff;
+                             ints[1]=bytes[1]& 0xff;
+
+   if(ints[0]>=0x81 && ints[0]<=0xFE &&
+ ints[1]>=0x40 && ints[1]<=0xFE){
+                                         isGB2312=true;
+                                         break;
+                             }
+                 }
+     }
+     return isGB2312;
+ }
+ 复制代码
